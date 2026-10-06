@@ -1,4 +1,4 @@
-import { sendSesEmail } from "../services/sesService.js";
+﻿import { sendSesEmail } from "../services/sesService.js";
 
 /**
  * Controller to handle POST request for sending email via AWS SES.
@@ -6,9 +6,9 @@ import { sendSesEmail } from "../services/sesService.js";
  * Expected payload:
  * {
  *   "secret password": "fixed password",
- *   "input email": ["recipient1@example.com"],
+ *   "input email": ["recipient1@example.com", "recipient2@example.com"],
  *   "subject": "Email Subject",
- *   "raw html data": "<h1>HTML Content</h1>"
+ *   "raw_html": "<h1>HTML Content</h1>"
  * }
  */
 export const handleSendEmail = async (req, res, next) => {
@@ -82,37 +82,34 @@ export const handleSendEmail = async (req, res, next) => {
       });
     }
 
-    // 4. Validate raw html data
+    // 4. Validate raw_html
     const rawHtmlData =
+      req.body.raw_html ??
+      req.body["raw_html"] ??
       req.body["raw html data"] ??
       req.body.rawHtmlData ??
-      req.body.raw_html_data ??
       req.body.html;
 
     if (!rawHtmlData || typeof rawHtmlData !== "string") {
       return res.status(400).json({
         success: false,
         message:
-          "Validation error: 'raw html data' is required and must be an HTML string",
+          "Validation error: 'raw_html' is required and must be an HTML string",
       });
     }
 
-    // 5. Send email via AWS SES
-    const response = await sendSesEmail({
+    // 5. Send emails independently to each recipient via AWS SES
+    const results = await sendSesEmail({
       to: emails,
       subject: subject.trim(),
       html: rawHtmlData,
-      from: req.body.from,
-      cc: req.body.cc,
-      bcc: req.body.bcc,
-      replyTo: req.body.replyTo,
     });
 
     return res.status(200).json({
       success: true,
-      message: "Email sent successfully",
-      messageId: response.MessageId,
-      recipients: emails,
+      message: `Successfully sent ${results.length} email(s)`,
+      total: results.length,
+      results: results,
     });
   } catch (error) {
     console.error("Error sending email via SES:", error);
@@ -122,4 +119,3 @@ export const handleSendEmail = async (req, res, next) => {
     });
   }
 };
-
