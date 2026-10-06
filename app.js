@@ -19,7 +19,7 @@ app.use(
     },
     credentials: true,
     methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "x-secret-password"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-password", "x-secret-password"],
   })
 );
 
@@ -53,8 +53,8 @@ app.get("/", (req, res) => {
       "Content-Type": "application/json",
     },
     expectedPayload: {
-      "secret password": "fixed secret password (matches SECRET_PASSWORD in .env)",
-      "input email": [
+      password: "fixed secret password (matches SECRET_PASSWORD in .env)",
+      mails: [
         "recipient1@example.com",
         "recipient2@example.com",
       ],
@@ -71,8 +71,8 @@ app.get("/", (req, res) => {
         "Content-Type": "application/json",
       },
       body: {
-        "secret password": "your_fixed_secret_password",
-        "input email": [
+        password: "your_fixed_secret_password",
+        mails: [
           "recipient1@example.com",
           "recipient2@example.com",
         ],
@@ -82,9 +82,9 @@ app.get("/", (req, res) => {
       },
     },
     curlExample:
-      `curl -X POST http://localhost:3033/email/send -H "Content-Type: application/json" -d '{"secret password":"your_secret_password","input email":["user1@example.com","user2@example.com"],"subject":"Hello","raw_html":"<h1>Hello World</h1>","from":"${defaultSender}"}'`,
+      `curl -X POST http://localhost:3033/email/send -H "Content-Type: application/json" -d '{"password":"your_secret_password","mails":["user1@example.com","user2@example.com"],"subject":"Hello","raw_html":"<h1>Hello World</h1>","from":"${defaultSender}"}'`,
     notes:
-      "Emails to an array of recipients are dispatched independently; recipients will only see their own email address in the inbox.",
+      "Emails to an array of recipients (mails) are dispatched independently; recipients will only see their own email address in the inbox.",
   });
 });
 

@@ -5,8 +5,8 @@
  *
  * Expected payload:
  * {
- *   "secret password": "fixed password",
- *   "input email": ["recipient1@example.com", "recipient2@example.com"],
+ *   "password": "fixed password",
+ *   "mails": ["recipient1@example.com", "recipient2@example.com"],
  *   "subject": "Email Subject",
  *   "raw_html": "<h1>HTML Content</h1>",
  *   "from": "optional_sender@jagadeeswar.dev"
@@ -14,12 +14,13 @@
  */
 export const handleSendEmail = async (req, res, next) => {
   try {
-    // 1. Authenticate secret password
+    // 1. Authenticate password
     const secretPassword =
+      req.body.password ??
       req.body["secret password"] ??
       req.body.secretPassword ??
       req.body.secret_password ??
-      req.body.password ??
+      req.headers["x-password"] ??
       req.headers["x-secret-password"];
 
     const configuredSecret = process.env.SECRET_PASSWORD;
@@ -35,15 +36,16 @@ export const handleSendEmail = async (req, res, next) => {
     if (!secretPassword || secretPassword !== configuredSecret) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized: Invalid or missing secret password",
+        message: "Unauthorized: Invalid or missing password",
       });
     }
 
-    // 2. Validate recipient emails
+    // 2. Validate recipient emails (mails)
     const rawEmails =
+      req.body.mails ??
+      req.body.mail ??
       req.body["input email"] ??
       req.body.inputEmail ??
-      req.body.input_email ??
       req.body.emails ??
       req.body.to;
 
@@ -60,7 +62,7 @@ export const handleSendEmail = async (req, res, next) => {
       return res.status(400).json({
         success: false,
         message:
-          "Validation error: 'input email' is required and must be an email string or array of email strings",
+          "Validation error: 'mails' is required and must be an email string or array of email strings",
       });
     }
 
@@ -69,7 +71,7 @@ export const handleSendEmail = async (req, res, next) => {
     if (invalidEmails.length > 0) {
       return res.status(400).json({
         success: false,
-        message: `Validation error: Invalid email address(es): ${invalidEmails.join(", ")}`,
+        message: `Validation error: Invalid email address(es) in 'mails': ${invalidEmails.join(", ")}`,
       });
     }
 

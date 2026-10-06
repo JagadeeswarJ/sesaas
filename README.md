@@ -6,10 +6,10 @@ A lightweight Node.js Express service for dispatching emails via AWS Simple Emai
 
 ## 🚀 Key Features
 
-- **Independent Email Dispatch**: When an array of recipient emails is provided, each email is sent as an isolated message. Recipients **never** see other recipients in the `To:` header.
+- **Independent Email Dispatch**: When an array of recipient emails (`mails`) is provided, each email is sent as an isolated message. Recipients **never** see other recipients in the `To:` header.
 - **Custom / Default Sender**: Takes an optional `from` address in the request; if omitted, automatically falls back to `sesaas@jagadeeswar.dev`.
-- **Strict, Minimalist Payload**: Takes 4 required fields (`secret password`, `input email`, `subject`, `raw_html`) and 1 optional field (`from`).
-- **Fixed Secret Authentication**: Protects the endpoint against unauthorized invocation (`SECRET_PASSWORD`).
+- **Strict, Minimalist Payload**: Takes 4 required fields (`password`, `mails`, `subject`, `raw_html`) and 1 optional field (`from`).
+- **Fixed Secret Authentication**: Protects the endpoint against unauthorized invocation (`SECRET_PASSWORD` checked against `password`).
 - **Open CORS Policy**: Configured to accept requests from all origins (http, https, localhost on any port, curl, Postman).
 - **Simple JSON Specification Root (`GET /`)**: Returns a clean JSON object documenting the API schema, required & optional fields, and an example call.
 - **Dual Runtime Support**:
@@ -30,8 +30,8 @@ Content-Type: application/json
 #### Request Body
 ```json
 {
-  "secret password": "your_fixed_secret_password",
-  "input email": [
+  "password": "your_fixed_secret_password",
+  "mails": [
     "recipient1@example.com",
     "recipient2@example.com"
   ],
@@ -42,7 +42,9 @@ Content-Type: application/json
 ```
 
 > **Note:**
-> - `from` is **optional**. If not provided, it defaults to `sesaas@jagadeeswar.dev`.
+> - `password`: Fixed secret password matching `SECRET_PASSWORD` configured in `.env`.
+> - `mails`: Array of recipient email addresses (or single email string).
+> - `from`: **Optional**. If not provided, it defaults to `sesaas@jagadeeswar.dev`.
 
 #### Successful Response (`200 OK`)
 ```json
