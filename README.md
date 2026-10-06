@@ -7,10 +7,11 @@ A lightweight Node.js Express service for dispatching emails via AWS Simple Emai
 ## 🚀 Key Features
 
 - **Independent Email Dispatch**: When an array of recipient emails is provided, each email is sent as an isolated message. Recipients **never** see other recipients in the `To:` header.
-- **Strict, Minimalist Payload**: Takes only the 4 required fields (`secret password`, `input email`, `subject`, `raw_html`).
+- **Custom / Default Sender**: Takes an optional `from` address in the request; if omitted, automatically falls back to `sesaas@jagadeeswar.dev`.
+- **Strict, Minimalist Payload**: Takes 4 required fields (`secret password`, `input email`, `subject`, `raw_html`) and 1 optional field (`from`).
 - **Fixed Secret Authentication**: Protects the endpoint against unauthorized invocation (`SECRET_PASSWORD`).
 - **Open CORS Policy**: Configured to accept requests from all origins (http, https, localhost on any port, curl, Postman).
-- **Simple JSON Specification Root (`GET /`)**: Returns a clean JSON object documenting the API schema, required fields, and an example call.
+- **Simple JSON Specification Root (`GET /`)**: Returns a clean JSON object documenting the API schema, required & optional fields, and an example call.
 - **Dual Runtime Support**:
   - Run locally with Express (`npm run dev` or `npm start` on port `3033`).
   - Deploy directly as a Firebase Function (`npm run deploy` via `firebase-functions/v2/https`).
@@ -35,9 +36,13 @@ Content-Type: application/json
     "recipient2@example.com"
   ],
   "subject": "Greetings from jagadeeswar.dev",
-  "raw_html": "<h1>Hello!</h1><p>This is an automated email sent independently via AWS SES.</p>"
+  "raw_html": "<h1>Hello!</h1><p>This is an automated email sent independently via AWS SES.</p>",
+  "from": "optional_sender@jagadeeswar.dev"
 }
 ```
+
+> **Note:**
+> - `from` is **optional**. If not provided, it defaults to `sesaas@jagadeeswar.dev`.
 
 #### Successful Response (`200 OK`)
 ```json

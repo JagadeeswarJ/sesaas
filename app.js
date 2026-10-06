@@ -47,7 +47,7 @@ app.get("/", (req, res) => {
     service: "SESaaS - AWS SES Email Service",
     status: "active",
     domain: domain,
-    sender: defaultSender,
+    defaultSender: defaultSender,
     endpoint: "POST /email/send",
     headers: {
       "Content-Type": "application/json",
@@ -60,6 +60,9 @@ app.get("/", (req, res) => {
       ],
       subject: "Your email subject string",
       raw_html: "<h1>Your HTML content</h1><p>Email body text...</p>",
+    },
+    optionalPayload: {
+      from: `Optional custom sender email (defaults to ${defaultSender})`,
     },
     exampleCall: {
       url: "http://localhost:3033/email/send",
@@ -75,10 +78,11 @@ app.get("/", (req, res) => {
         ],
         subject: `Greetings from ${domain}`,
         raw_html: "<h1>Hello!</h1><p>This is a raw HTML email message sent independently via AWS SES.</p>",
+        from: defaultSender,
       },
     },
     curlExample:
-      'curl -X POST http://localhost:3033/email/send -H "Content-Type: application/json" -d \'{"secret password":"your_secret_password","input email":["user1@example.com","user2@example.com"],"subject":"Hello","raw_html":"<h1>Hello World</h1>"}\'',
+      `curl -X POST http://localhost:3033/email/send -H "Content-Type: application/json" -d '{"secret password":"your_secret_password","input email":["user1@example.com","user2@example.com"],"subject":"Hello","raw_html":"<h1>Hello World</h1>","from":"${defaultSender}"}'`,
     notes:
       "Emails to an array of recipients are dispatched independently; recipients will only see their own email address in the inbox.",
   });

@@ -8,7 +8,8 @@
  *   "secret password": "fixed password",
  *   "input email": ["recipient1@example.com", "recipient2@example.com"],
  *   "subject": "Email Subject",
- *   "raw_html": "<h1>HTML Content</h1>"
+ *   "raw_html": "<h1>HTML Content</h1>",
+ *   "from": "optional_sender@jagadeeswar.dev"
  * }
  */
 export const handleSendEmail = async (req, res, next) => {
@@ -98,11 +99,19 @@ export const handleSendEmail = async (req, res, next) => {
       });
     }
 
-    // 5. Send emails independently to each recipient via AWS SES
+    // 5. Optional sender address ('from')
+    const from =
+      req.body.from ??
+      req.body["from email"] ??
+      req.body.from_email ??
+      req.body.sender;
+
+    // 6. Send emails independently to each recipient via AWS SES
     const results = await sendSesEmail({
       to: emails,
       subject: subject.trim(),
       html: rawHtmlData,
+      from,
     });
 
     return res.status(200).json({

@@ -9,12 +9,18 @@ import { sesClient } from "../config/awsConfig.js";
  * @param {string[]} params.to - Array of recipient email addresses
  * @param {string} params.subject - Email subject
  * @param {string} params.html - Raw HTML content
+ * @param {string} [params.from] - Optional custom sender address (defaults to sesaas@jagadeeswar.dev)
  * @returns {Promise<Array<{ email: string, messageId: string }>>}
  */
-export const sendSesEmail = async ({ to, subject, html }) => {
+export const sendSesEmail = async ({ to, subject, html, from }) => {
   const defaultDomain = process.env.DOMAIN || "jagadeeswar.dev";
-  const sourceEmail =
+  const defaultSender =
     process.env.AWS_SES_SENDER_EMAIL || `sesaas@${defaultDomain}`;
+
+  const sourceEmail =
+    from && typeof from === "string" && from.trim()
+      ? from.trim()
+      : defaultSender;
 
   const recipientList = Array.isArray(to) ? to : [to];
 
