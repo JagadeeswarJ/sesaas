@@ -1,0 +1,26 @@
+{
+  "name": "sesaas",
+  "version": "1.0.0",
+  "description": "AWS SES Email Service deployed on Firebase Functions",
+  "type": "module",
+  "main": "firebaseIndex.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "deploy": "firebase deploy --only functions"
+  },
+  "author": "Jagadeeswar",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-ses": "^3.758.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.5.0",
+    "firebase-functions": "^6.5.0",
+    "serve-favicon": "^2.5.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
